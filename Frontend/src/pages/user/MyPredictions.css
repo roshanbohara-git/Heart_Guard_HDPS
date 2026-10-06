@@ -1,0 +1,32 @@
+.predictions-page {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.predictions-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+}
+
+.predictions-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.4;
+}
+
+.predictions-empty h3 {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.predictions-empty p {
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.predictions-count {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}

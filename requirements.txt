@@ -1,0 +1,30 @@
+# Heart Guard FYP - Python Dependencies
+
+# --- Backend Framework ---
+fastapi
+uvicorn[standard]
+python-multipart
+
+# --- Data Validation (Pydantic) ---
+pydantic
+pydantic-settings
+email-validator
+
+# --- Database (SQLAlchemy + MySQL) ---
+sqlalchemy
+mysql-connector-python
+
+# --- Authentication & Security ---
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-jose[cryptography]
+
+# --- ML Model Inference ---
+joblib
+pandas
+numpy
+scikit-learn
+
+# --- ML Model Training (Notebooks) ---
+matplotlib
+seaborn

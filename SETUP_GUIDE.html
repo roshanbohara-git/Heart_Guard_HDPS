@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeartGuard — Installation and Run Guide</title>
+    <style>
+        /* ── Print & Page Setup ── */
+        @page {
+            size: A4;
+            margin: 2.2cm 2cm 2.5cm 2cm;
+        }
+        @media print {
+            body { font-size: 11pt; }
+            .page-break { page-break-before: always; }
+            footer.page-number { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 10pt; color: #555; }
+        }
+
+        /* ── Base ── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 12pt;
+            line-height: 1.55;
+            color: #1a1a1a;
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        /* ── Title Block ── */
+        .title-block {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-top: 30px;
+        }
+        .title-block h1 {
+            font-size: 20pt;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .title-block .subtitle {
+            font-size: 13pt;
+            font-weight: normal;
+            color: #333;
+        }
+
+        /* ── Intro Paragraph ── */
+        .intro {
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+
+        /* ── Headings ── */
+        h2 {
+            font-size: 15pt;
+            font-weight: bold;
+            margin-top: 28px;
+            margin-bottom: 10px;
+            border-bottom: none;
+        }
+        h3 {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        /* ── Paragraphs & Lists ── */
+        p { margin-bottom: 10px; text-align: justify; }
+        ul, ol { margin-left: 28px; margin-bottom: 10px; }
+        li { margin-bottom: 5px; }
+
+        /* ── Tables ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 16px 0;
+            font-size: 11pt;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 6px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        /* ── Code Blocks ── */
+        pre {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 10px 14px;
+            margin: 8px 0 14px 0;
+            font-family: "Consolas", "Courier New", monospace;
+            font-size: 10pt;
+            line-height: 1.45;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        code {
+            font-family: "Consolas", "Courier New", monospace;
+            font-size: 10pt;
+            background-color: #f0f0f0;
+            padding: 1px 4px;
+            border-radius: 2px;
+        }
+
+        /* ── Bold labels ── */
+        .label { font-weight: bold; }
+
+        /* ── Important Box ── */
+        .important {
+            margin: 10px 0 14px 0;
+            padding: 0;
+        }
+        .important strong { font-weight: bold; }
+
+        /* ── Indented sub-list ── */
+        ul.sub { margin-left: 24px; list-style-type: disc; }
+        ul.dash { list-style-type: none; margin-left: 28px; }
+        ul.dash li::before { content: "– "; }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TITLE                                       -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="title-block">
+    <h1>Heart Disease Prediction System (HeartGuard)</h1>
+    <div class="subtitle">Installation and Run Guide</div>
+</div>
+
+<p class="intro">
+    This guide explains, step by step, how to open and run this project on a new computer:
+    installing the required software, creating the MySQL database and tables, configuring the
+    backend, installing Python and Node.js dependencies, starting the backend server, starting
+    the frontend web app, and logging in as a user and as an admin.
+</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. PROJECT OVERVIEW                         -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>1. Project Overview</h2>
+
+<p>
+    The system predicts the risk level (Low / Moderate / High) of heart disease using a
+    machine learning model (Random Forest Classifier). A user enters 11 clinical features
+    (age, sex, chest pain type, resting BP, cholesterol, etc.) and the model returns a
+    prediction with a probability score.
+</p>
+
+<p>The project has four parts:</p>
+
+<table>
+    <tr>
+        <th>Part</th>
+        <th>Technology</th>
+        <th>Folder</th>
+        <th>What it does</th>
+    </tr>
+    <tr>
+        <td>Frontend</td>
+        <td>React + Vite</td>
+        <td><code>Frontend/</code></td>
+        <td>Web app for users and admin dashboard</td>
+    </tr>
+    <tr>
+        <td>Backend</td>
+        <td>Python FastAPI</td>
+        <td><code>Backend/</code></td>
+        <td>REST API, runs the ML model, saves results</td>
+    </tr>
+    <tr>
+        <td>Database</td>
+        <td>MySQL</td>
+        <td><code>Database/</code></td>
+        <td>Stores users, admins and predictions</td>
+    </tr>
+    <tr>
+        <td>ML Training</td>
+        <td>Jupyter Notebook</td>
+        <td><code>ML_Model_Training/</code></td>
+        <td>Shows how the model was trained (not needed to run the app)</td>
+    </tr>
+</table>
+
+<h3>How the parts are connected:</h3>
+
+<pre>Browser (React Web App) ---> FastAPI backend (port 8000) ---> MySQL (port 3306)
+                                      |
+                                      +---> ML model (heart_disease_pipeline.joblib)</pre>
+
+<ul>
+    <li>The frontend talks to the backend using the address <code>http://localhost:8000</code>.
+        This is already set in <code>Frontend/src/api/axios.js</code> (line 4), so nothing
+        needs to be changed for the web version.</li>
+    <li>The backend talks to the database using the connection details in the file
+        <code>Backend/.env</code> (you create/edit this file in Step 3).</li>
+</ul>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. FOLDER STRUCTURE                         -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>2. Folder Structure</h2>
+
+<pre>HEART GURAD FYP/
+|-- README.md                            &lt;- detailed project documentation
+|-- requirements.txt                     &lt;- list of all Python libraries
+|-- SETUP_GUIDE.html                     &lt;- this setup guide
+|
+|-- Backend/
+|   |-- .env                             &lt;- database & secret key settings
+|   |-- requirements.txt                 &lt;- Python library list (same as root)
+|   |-- heart_disease_pipeline.joblib    &lt;- trained ML model file
+|   |-- app/
+|       |-- main.py                      &lt;- MAIN backend file (server starts here)
+|       |-- config.py                    &lt;- reads settings from .env
+|       |-- database.py                  &lt;- database connection setup
+|       |-- dependencies.py              &lt;- database session helper
+|       |-- utils_auth.py               &lt;- JWT token verification
+|       |-- core/
+|       |   |-- security.py             &lt;- password hashing & JWT creation
+|       |   |-- model_loader.py         &lt;- loads the ML model into memory
+|       |-- models/
+|       |   |-- user.py                 &lt;- User database table
+|       |   |-- prediction.py           &lt;- HeartDiseasePrediction table
+|       |-- schemas/
+|       |   |-- auth.py                 &lt;- register/login request schemas
+|       |   |-- user.py                 &lt;- user response schema
+|       |   |-- prediction.py           &lt;- prediction input/output schemas
+|       |-- routers/
+|           |-- auth.py                 &lt;- /auth/register, /auth/login
+|           |-- users.py                &lt;- /users/me, /users/my-predictions
+|           |-- predictions.py          &lt;- /predictions/ (make prediction)
+|           |-- admin.py                &lt;- /admin/* (dashboard, users, etc.)
+|
+|-- Frontend/
+|   |-- package.json                     &lt;- list of Node.js packages
+|   |-- vite.config.js                   &lt;- Vite build configuration
+|   |-- index.html                       &lt;- HTML entry point
+|   |-- src/
+|       |-- main.jsx                     &lt;- app starting point
+|       |-- App.jsx                      &lt;- routes and navigation
+|       |-- api/
+|       |   |-- axios.js                 &lt;- backend address (URL) is set here
+|       |-- context/
+|       |   |-- AuthContext.jsx          &lt;- login/logout state management
+|       |-- components/                  &lt;- reusable UI components (Navbar, etc.)
+|       |-- pages/                       &lt;- all app screens
+|           |-- LandingPage.jsx          &lt;- public homepage
+|           |-- Login.jsx                &lt;- login form
+|           |-- Register.jsx             &lt;- registration form
+|           |-- user/                    &lt;- user screens (Dashboard, Predict, History)
+|           |-- admin/                   &lt;- admin screens (Dashboard, Users, Predictions)
+|
+|-- Database/
+|   |-- schema.sql                       &lt;- SQL script to create the database &amp; tables
+|
+|-- ML_Model_Training/
+    |-- ml_model.ipynb                   &lt;- model training notebook (main)
+    |-- model.ipynb                      &lt;- alternative training notebook
+    |-- heart_disease_datasets.csv       &lt;- training dataset
+    |-- heart_disease_pipeline.joblib    &lt;- exported trained model
+    |-- heart_disease_model.pkl          &lt;- alternative exported model</pre>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. SOFTWARE REQUIREMENTS                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>3. Software Requirements</h2>
+
+<p>Install the following software before starting:</p>
+
+<table>
+    <tr>
+        <th>Software</th>
+        <th>Version</th>
+        <th>Download link</th>
+        <th>Used for</th>
+    </tr>
+    <tr>
+        <td>Python</td>
+        <td>3.11</td>
+        <td>https://www.python.org/downloads/</td>
+        <td>Backend</td>
+    </tr>
+    <tr>
+        <td>Node.js</td>
+        <td>18 or newer (LTS)</td>
+        <td>https://nodejs.org/</td>
+        <td>Frontend</td>
+    </tr>
+    <tr>
+        <td>MySQL Server + MySQL Workbench</td>
+        <td>8.0 or newer</td>
+        <td>https://dev.mysql.com/downloads/installer/</td>
+        <td>Database</td>
+    </tr>
+    <tr>
+        <td>Google Chrome or Microsoft Edge</td>
+        <td>Latest</td>
+        <td>—</td>
+        <td>To open the web app</td>
+    </tr>
+    <tr>
+        <td>VS Code (optional)</td>
+        <td>Latest</td>
+        <td>https://code.visualstudio.com/</td>
+        <td>To open and view the code</td>
+    </tr>
+</table>
+
+<h3>Installation notes:</h3>
+<ul>
+    <li><span class="label">Python (Windows):</span> on the first screen of the installer, tick
+        <strong>"Add python.exe to PATH"</strong>. Select Python 3.11 specifically.</li>
+    <li><span class="label">Node.js:</span> download the LTS version. The installer will
+        automatically add <code>node</code> and <code>npm</code> to your PATH.</li>
+    <li><span class="label">MySQL:</span> during installation, set a root password and remember it
+        (example: <code>admin</code>). Keep the port as <strong>3306</strong>. MySQL Workbench is
+        included in the MySQL Installer for Windows.</li>
+    <li>An internet connection is needed the first time, to download the Python and Node.js packages.</li>
+</ul>
+
+<p>Check that everything is installed (open a new Command Prompt / terminal):</p>
+<pre>python --version
+node --version
+npm --version</pre>
+
+<p><strong>Note:</strong> On macOS / Linux, use <code>python3</code> instead of <code>python</code>
+in all the commands in this guide.</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. STEP-BY-STEP SETUP                       -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>4. Step-by-Step Setup (First Time)</h2>
+
+<!-- ── Step 1 ── -->
+<h3>Step 1 — Copy the Project to the Computer</h3>
+
+<p>
+    Copy the whole project folder from the pen drive to the computer, for example to
+    <code>C:\FYP\</code> or the Desktop. Run it from the computer, not directly from the pen drive.
+</p>
+
+<p>
+    <span class="label">How to open a terminal inside a folder (Windows):</span> open the folder in
+    File Explorer, click the address bar, type <code>cmd</code> and press Enter. (In VS Code:
+    right-click the folder and choose Open in Integrated Terminal.)
+</p>
+
+
+<!-- ── Step 2 ── -->
+<h3>Step 2 — Create the MySQL Database and Tables</h3>
+
+<p>
+    The project uses a MySQL database named <code>heart_disease</code>. The database is not inside
+    the project folder. Each computer has its own MySQL, so the database must be created once on
+    the new computer.
+</p>
+
+<h3>Option A — MySQL Workbench (easiest)</h3>
+<ol>
+    <li>Open <strong>MySQL Workbench 8.0 CE</strong> and click the Local instance MySQL connection.
+        Enter your MySQL root password.</li>
+    <li>Go to <strong>File → Open SQL Script</strong> and select the file:<br>
+        <code>Database/schema.sql</code></li>
+    <li>Click the <strong>⚡ Execute</strong> button (or press <code>Ctrl+Shift+Enter</code>).</li>
+    <li>Click the refresh icon in the Schemas panel. You should now see the
+        <code>heart_disease</code> database with two tables: <code>users</code> and
+        <code>heart_predictions</code>.</li>
+</ol>
+
+<h3>Option B — Command line</h3>
+<pre>mysql -u root -p</pre>
+<p>Enter your MySQL password, then type:</p>
+<pre>SOURCE C:/path/to/HEART GURAD FYP/Database/schema.sql;
+EXIT;</pre>
+<p>(Replace <code>C:/path/to/</code> with the actual path where you copied the project.)</p>
+
+<p>
+    The <code>schema.sql</code> script creates the database and both tables automatically. You can
+    verify by running <code>SHOW TABLES;</code> in the <code>heart_disease</code> database.
+</p>
+
+
+<!-- ── Step 3 ── -->
+<div class="page-break"></div>
+<h3>Step 3 — Connect the Backend to the Database (.env file)</h3>
+
+<p>
+    The backend reads the database username, password, and other settings from a file named
+    <code>.env</code> inside the <code>Backend</code> folder.
+</p>
+
+<ol>
+    <li>Open the <code>Backend</code> folder.</li>
+    <li>Open the <code>.env</code> file with Notepad or VS Code. If the file does not exist, create
+        a new file named exactly <code>.env</code> (not <code>.env.txt</code>).</li>
+    <li>
+        Edit the file contents to match your MySQL credentials:
+        <pre>DATABASE_URL = mysql+mysqlconnector://root:admin@localhost/heart_disease
+SECRET_KEY = admin
+ALGORITHM = HS256
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+MODEL_PATH = heart_disease_pipeline.joblib</pre>
+        <ul class="dash">
+            <li>The format is: <code>mysql+mysqlconnector://USERNAME:PASSWORD@localhost/heart_disease</code></li>
+            <li>Replace <code>root</code> with your MySQL username and <code>admin</code> (after the colon) with your MySQL password.</li>
+            <li><code>SECRET_KEY</code> can be any long random text. It is used to create login tokens.</li>
+            <li>If your password contains special characters like <code>@</code>, <code>#</code>,
+                <code>/</code> or <code>:</code>, replace them with their URL codes (for example
+                <code>@</code> becomes <code>%40</code>).</li>
+        </ul>
+    </li>
+    <li>Save the file.</li>
+</ol>
+
+<p class="important">
+    <strong>Important:</strong> The file name must be exactly <code>.env</code>, not
+    <code>.env.txt</code>. In File Explorer, turn on
+    <strong>View &gt; Show &gt; File name extensions</strong> to check.
+</p>
+
+
+<!-- ── Step 4 ── -->
+<h3>Step 4 — Install the Backend (Python) Libraries</h3>
+
+<p>Open a terminal inside the <code>Backend</code> folder and run these commands one by one:</p>
+
+<pre>python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt</pre>
+
+<ul>
+    <li><code>python -m venv .venv</code> creates a virtual environment (a private folder for this
+        project's libraries). This is done only once. (Note: you can also name it <code>venv</code>.)</li>
+    <li><code>.venv\Scripts\activate</code> activates it. After this, <code>(.venv)</code> appears at
+        the start of the terminal line.
+        <ul class="dash">
+            <li>macOS / Linux: <code>source .venv/bin/activate</code></li>
+            <li>Windows PowerShell: <code>.venv\Scripts\Activate.ps1</code></li>
+        </ul>
+    </li>
+    <li><code>pip install -r requirements.txt</code> installs all libraries listed in
+        <code>requirements.txt</code> (FastAPI, Uvicorn, SQLAlchemy, MySQL connector, pandas,
+        scikit-learn, bcrypt, etc.).</li>
+</ul>
+
+
+<!-- ── Step 5 ── -->
+<h3>Step 5 — Start the Backend Server</h3>
+
+<p>In the same terminal (with <code>(.venv)</code> active), inside the <code>Backend</code> folder, run:</p>
+
+<pre>uvicorn app.main:app --reload --host 0.0.0.0 --port 8000</pre>
+
+<p>The backend is running when you see:</p>
+<pre>INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Application startup complete.</pre>
+
+<p>
+    At this moment the backend has also connected to MySQL. The tables were already created by
+    the <code>schema.sql</code> script in Step 2. (SQLAlchemy's <code>create_all</code> will
+    also create them automatically if they don't exist.)
+</p>
+
+<p>Check that it works by opening these addresses in the browser:</p>
+<ul>
+    <li><code>http://127.0.0.1:8000</code> — shows
+        <code>{"message": "Heart Disease Prediction System API is running."}</code></li>
+    <li><code>http://127.0.0.1:8000/docs</code> — interactive API page (Swagger UI) where every API
+        can be tested with the Try it out button</li>
+</ul>
+
+<p>Keep this terminal open. Closing it stops the backend. Use a new terminal for the next step.</p>
+
+
+<!-- ── Step 6 ── -->
+<div class="page-break"></div>
+<h3>Step 6 — Install and Run the Frontend Web App</h3>
+
+<p>Open a <strong>new terminal</strong> inside the <code>Frontend</code> folder and run:</p>
+
+<pre>npm install
+npm run dev</pre>
+
+<ul>
+    <li><code>npm install</code> downloads all JavaScript packages listed in <code>package.json</code>
+        (React, Axios, React Router, Vite, etc.). This is needed only the first time.</li>
+    <li><code>npm run dev</code> starts the Vite development server and opens the web app.</li>
+</ul>
+
+<p>When you see the following output, the frontend is running:</p>
+<pre>  VITE v8.x.x  ready in xxx ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose</pre>
+
+<p>
+    Open <code>http://localhost:5173</code> in Google Chrome or Microsoft Edge. You should see the
+    HeartGuard landing page.
+</p>
+
+<p>
+    <span class="label">Connection between frontend and backend:</span> The web app sends all
+    requests to <code>http://localhost:8000</code>. This is already set in
+    <code>Frontend/src/api/axios.js</code> (line 4), so no change is needed as long as the backend
+    from Step 5 is running on the same computer.
+</p>
+
+
+<!-- ── Step 7 ── -->
+<h3>Step 7 — Create the Admin Account (First Time Only)</h3>
+
+<p>
+    A new database is empty, so there is no admin account yet. Create one from the app:
+</p>
+
+<ol>
+    <li>On the web app's landing page, click <strong>Get Started</strong> or go to the Register page.</li>
+    <li>Fill in the registration form:
+        <ul class="dash">
+            <li><strong>Full Name:</strong> System Admin</li>
+            <li><strong>Username:</strong> admin</li>
+            <li><strong>Email:</strong> admin@heartguard.com</li>
+            <li><strong>Password:</strong> (choose a password, minimum 5 characters)</li>
+            <li><strong>Role:</strong> select <strong>Admin</strong></li>
+        </ul>
+    </li>
+    <li>Click Register. You should see a success message.</li>
+    <li>Go to the Login page and log in with the admin username and password.</li>
+    <li>You will be redirected to the <strong>Admin Dashboard</strong> where you can see all users,
+        all predictions, and dashboard statistics.</li>
+</ol>
+
+<p>To create a regular user account, repeat the steps above but select <strong>User</strong> as
+the role. Regular users can:</p>
+<ul>
+    <li>Make heart disease predictions</li>
+    <li>View their prediction history</li>
+    <li>View their profile</li>
+</ul>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. LOGIN DETAILS                            -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>5. Login Details</h2>
+
+<table>
+    <tr>
+        <th>Role</th>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>Admin</td>
+        <td><code>admin</code></td>
+        <td><code>Admin@123</code></td>
+        <td>Create it first using the Register page (Step 7)</td>
+    </tr>
+    <tr>
+        <td>User</td>
+        <td>Any username you register</td>
+        <td>Any password</td>
+        <td>Register on the Register page with role "User"</td>
+    </tr>
+</table>
+
+<p>From now on, log in with the Login page using the same username and password. (Any name,
+email and password can be used; the ones above are just suggestions.)</p>
+
+<p><strong>Note:</strong> Passwords are stored in the database as secure bcrypt hashes, not as plain text.</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 6. HOW TO USE AND TEST THE SYSTEM           -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>6. How to Use and Test the System</h2>
+
+<p>When the web app opens, the landing page shows two options: the User portal and the Admin portal.</p>
+
+<h3>6.1 Test as a User</h3>
+<ol>
+    <li>On the landing page, click <strong>Get Started</strong> to go to the Login page.</li>
+    <li>Log in with a user account. (Or go to the Register page first to create one with role "User".)</li>
+    <li>On the <strong>Dashboard</strong>, you will see a welcome message and quick links.</li>
+    <li>Click <strong>Predict</strong> (or go to the Predict page from the Navbar). Fill in the form with
+        the 11 clinical features:
+        <ul class="dash">
+            <li><strong>Age:</strong> patient's age (1–120)</li>
+            <li><strong>Sex:</strong> M or F</li>
+            <li><strong>Chest Pain Type:</strong> ATA, NAP, ASY, or TA</li>
+            <li><strong>Resting BP:</strong> resting blood pressure in mmHg (50–250)</li>
+            <li><strong>Cholesterol:</strong> serum cholesterol in mg/dl (0–700)</li>
+            <li><strong>Fasting BS:</strong> 1 if fasting blood sugar &gt; 120 mg/dl, else 0</li>
+            <li><strong>Resting ECG:</strong> Normal, ST, or LVH</li>
+            <li><strong>Max HR:</strong> maximum heart rate achieved (60–250)</li>
+            <li><strong>Exercise Angina:</strong> Y or N</li>
+            <li><strong>Oldpeak:</strong> ST depression value (-10 to 10)</li>
+            <li><strong>ST Slope:</strong> Up, Flat, or Down</li>
+        </ul>
+    </li>
+    <li>Click <strong>Submit</strong>. The result screen shows:
+        <ul class="dash">
+            <li>The prediction: <strong>Heart Disease</strong> or <strong>Normal</strong></li>
+            <li>The probability (%) of heart disease</li>
+            <li>The risk level: <strong>Low</strong>, <strong>Moderate</strong>, or <strong>High</strong></li>
+        </ul>
+    </li>
+    <li>Go to <strong>My Predictions</strong> from the Navbar to see all past predictions with timestamps.</li>
+</ol>
+
+<h3>6.2 Test as Admin (Dashboard)</h3>
+<ol>
+    <li>Go to the landing page and click <strong>Get Started</strong>.</li>
+    <li>Log in with <code>admin</code> / <code>Admin@123</code> (created in Step 7).</li>
+    <li>You will be redirected to the <strong>Admin Dashboard</strong>. Use the Navbar to access:
+        <ul class="dash">
+            <li><strong>Dashboard</strong> — overview with total users, total predictions, and high-risk
+                prediction count</li>
+            <li><strong>All Users</strong> — list of all registered users with their details</li>
+            <li><strong>All Predictions</strong> — list of all predictions made by all users</li>
+            <li><strong>User Predictions</strong> — view predictions for a specific user (click from
+                the All Users page)</li>
+        </ul>
+    </li>
+</ol>
+
+<h3>6.3 Check the Saved Data in MySQL</h3>
+<p>In MySQL Workbench, run:</p>
+<pre>USE heart_disease;
+SELECT * FROM users;
+SELECT * FROM heart_predictions;</pre>
+<p>Every prediction made in the app is saved in these tables.</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 7. QUICK START                              -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>7. Quick Start (Every Time After the First Setup)</h2>
+
+<p>Make sure the MySQL service is running (on Windows it starts automatically with the computer). Then:</p>
+
+<h3>Terminal 1 — Backend</h3>
+<pre>cd Backend
+.venv\Scripts\activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000</pre>
+
+<h3>Terminal 2 — Frontend</h3>
+<pre>cd Frontend
+npm run dev</pre>
+
+<p>Then open <code>http://localhost:5173</code> in Google Chrome or Microsoft Edge and log in (e.g. as admin with <code>admin</code> / <code>Admin@123</code>).</p>
+
+<p><strong>To stop:</strong> press <code>Ctrl+C</code> in each terminal window.</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 8. OPTIONAL - DATABASE EXPORT/IMPORT        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>8. Optional — Use the Developer's Existing Data</h2>
+
+<p>By default, the new computer starts with an empty database. If you want the examiner to see
+the same users, admin account and predictions as on the developer's laptop, export the
+database and import it on the new computer.</p>
+
+<h3>On the developer's laptop (export):</h3>
+<ol>
+    <li>Open MySQL Workbench and go to <strong>Server &gt; Data Export</strong>.</li>
+    <li>Tick <code>heart_disease</code>, choose <strong>Export to Self-Contained File</strong>, and save it as
+        <code>heart_disease_backup.sql</code>.</li>
+    <li>Click <strong>Start Export</strong> and copy the <code>.sql</code> file to the pen drive.</li>
+</ol>
+
+<h3>On the new computer (import):</h3>
+<ol>
+    <li>Do Step 2 (create the empty <code>heart_disease</code> database using <code>schema.sql</code>).</li>
+    <li>In MySQL Workbench, go to <strong>Server &gt; Data Import</strong>.</li>
+    <li>Choose <strong>Import from Self-Contained File</strong> and select
+        <code>heart_disease_backup.sql</code>.</li>
+    <li>Set <strong>Default Target Schema</strong> to <code>heart_disease</code> and click
+        <strong>Start Import</strong>.</li>
+</ol>
+
+<p>After importing, the developer's existing admin email and password will work, and Step 7
+is not needed.</p>
+
+<p>(Command-line alternative: export with <code>mysqldump -u root -p
+heart_disease &gt; heart_disease_backup.sql</code> and import with
+<code>mysql -u root -p heart_disease &lt;
+heart_disease_backup.sql</code>.)</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 9. OPTIONAL - PRODUCTION BUILD              -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>9. Optional — Build the Frontend for Production</h2>
+
+<p>
+    The backend and frontend can run in development mode (as shown in Step 5 and Step 6).
+    If you want to create an optimized production build of the frontend:
+</p>
+
+<ol>
+    <li>Open a terminal in the <code>Frontend</code> directory and run:
+        <pre>npm run build</pre>
+        This compiles and minifies the React application into static HTML, JavaScript, and CSS
+        files inside the <code>Frontend/dist</code> folder.
+    </li>
+    <li>To test and preview the production build locally without Vite's dev server, run:
+        <pre>npm run preview</pre>
+        This starts a local preview server at <code>http://localhost:4173</code>.
+    </li>
+    <li>Open <code>http://localhost:4173</code> in Chrome to access the production build.</li>
+</ol>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 10. BACKEND API ENDPOINTS                   -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>10. Backend API Endpoints</h2>
+
+<table>
+    <tr>
+        <th style="width:15%">Method</th>
+        <th style="width:45%">Endpoint</th>
+        <th>Purpose</th>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/</code></td>
+        <td>Health check</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/auth/register</code></td>
+        <td>User registration (User or Admin)</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/auth/login</code></td>
+        <td>User login and JWT access token</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/users/me</code></td>
+        <td>Current logged-in user profile</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/users/my-predictions</code></td>
+        <td>Current user's prediction history</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td><code>/predictions/</code></td>
+        <td>Heart disease risk prediction</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/admin/dashboard-stats</code></td>
+        <td>Admin dashboard statistics</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/admin/users</code></td>
+        <td>List of all registered users</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/admin/predictions</code></td>
+        <td>List of all predictions in the system</td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td><code>/admin/users/{id}/predictions</code></td>
+        <td>Predictions made by a specific user</td>
+    </tr>
+</table>
+
+<p>
+    Full details and an interactive <strong>Try it out</strong> button for each endpoint:
+    <code>http://127.0.0.1:8000/docs</code>
+</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 11. TROUBLESHOOTING                         -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>11. Troubleshooting</h2>
+
+<table>
+    <tr>
+        <th style="width:38%">Problem</th>
+        <th>Solution</th>
+    </tr>
+    <tr>
+        <td><code>RuntimeError: DATABASE_URL is not set</code></td>
+        <td>The <code>.env</code> file is missing or has the wrong name. Repeat Step 3. The name must
+            be <code>.env</code>, not <code>.env.txt</code>.</td>
+    </tr>
+    <tr>
+        <td><code>Access denied for user 'root'@'localhost'</code></td>
+        <td>Wrong MySQL username or password in <code>.env</code>. Fix it and restart the backend.</td>
+    </tr>
+    <tr>
+        <td><code>Unknown database 'heart_disease'</code></td>
+        <td>The database was not created. Do Step 2 using MySQL Workbench and <code>schema.sql</code>.</td>
+    </tr>
+    <tr>
+        <td><code>Can't connect to MySQL server on 'localhost:3306'</code></td>
+        <td>MySQL is not running. Press Win+R, type <code>services.msc</code>, find MySQL80
+            (or MySQL) and click Start.</td>
+    </tr>
+    <tr>
+        <td>Heart prediction error / <code>scikit-learn</code> unpickling error</td>
+        <td>Wrong scikit-learn version. Run <code>pip install -r requirements.txt</code> (with venv active)
+            and restart the backend.</td>
+    </tr>
+    <tr>
+        <td><code>'python' is not recognized</code></td>
+        <td>Python is not in PATH. Reinstall Python 3.11 and tick "Add python.exe to PATH",
+            or use <code>py</code> instead of <code>python</code>.</td>
+    </tr>
+    <tr>
+        <td><code>'uvicorn' is not recognized</code></td>
+        <td>The virtual environment is not active (no <code>(.venv)</code> in the terminal). Run
+            <code>.venv\Scripts\activate</code> first, or use
+            <code>python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000</code>.</td>
+    </tr>
+    <tr>
+        <td><code>You must pass the application as an import string to enable 'reload'</code></td>
+        <td>This appears when starting with <code>python app/main.py</code>. Start the backend with the
+            <code>uvicorn app.main:app --reload ...</code> command from Step 5 instead.</td>
+    </tr>
+    <tr>
+        <td>PowerShell: running scripts is disabled on this system</td>
+        <td>Use Command Prompt (<code>cmd</code>) instead, or run
+            <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> once.</td>
+    </tr>
+    <tr>
+        <td>A virtual environment folder copied from another computer does not work</td>
+        <td>Delete the <code>.venv</code> (or <code>venv</code>) folder and repeat Step 4.</td>
+    </tr>
+    <tr>
+        <td><code>Address already in use / error 10048 on port 8000</code></td>
+        <td>Another backend is already running. Close the other terminal (or restart the computer)
+            and start again.</td>
+    </tr>
+    <tr>
+        <td><code>'node' is not recognized</code> or <code>'npm' is not recognized</code></td>
+        <td>Node.js is not in PATH. Reinstall Node.js (LTS version) and open a new terminal.</td>
+    </tr>
+    <tr>
+        <td>Web app shows a network error or "Failed to fetch"</td>
+        <td>The backend is not running. Start it (Step 5) and check
+            <code>http://127.0.0.1:8000</code>.</td>
+    </tr>
+    <tr>
+        <td>Port 5173 already in use</td>
+        <td>Vite will automatically try the next available port (5174). Check the terminal output
+            for the exact URL.</td>
+    </tr>
+    <tr>
+        <td>Admin login: "Incorrect username or password"</td>
+        <td>The admin account does not exist in this computer's database. Create it with the
+            Register page (Step 7).</td>
+    </tr>
+</table>
+
+<p>
+    <strong>Note:</strong> The Jupyter notebooks in <code>ML_Model_Training/</code> were used
+    during development for exploratory data analysis, evaluation, and model training. To run the
+    project, always start the backend with <code>uvicorn app.main:app ...</code> as shown in Step 5.
+    The pre-trained pipeline (<code>Backend/heart_disease_pipeline.joblib</code>) is already
+    included and loaded automatically on startup.
+</p>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 12. TECHNOLOGIES USED                       -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>12. Technologies Used</h2>
+
+<ul>
+    <li><span class="label">Frontend:</span> React 19, Vite, Axios, React Router DOM, React Icons</li>
+    <li><span class="label">Backend:</span> FastAPI, Uvicorn, SQLAlchemy, Pydantic, bcrypt,
+        python-jose (JWT tokens)</li>
+    <li><span class="label">Database:</span> MySQL 8.0 (mysql-connector-python)</li>
+    <li><span class="label">Machine Learning:</span> scikit-learn (Random Forest Classifier),
+        pandas, NumPy, joblib</li>
+    <li><span class="label">Model Training:</span> Jupyter Notebook
+        (<code>ML_Model_Training/ml_model.ipynb</code>,
+        <code>ML_Model_Training/model.ipynb</code>)</li>
+    <li><span class="label">Data Visualization (Training):</span> Matplotlib, Seaborn</li>
+</ul>
+
+<p><em>Disclaimer: This system is an academic project. The predictions are for educational
+purposes only and are not a medical diagnosis.</em></p>
+
+
+</body>
+</html>
